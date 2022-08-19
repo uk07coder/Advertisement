@@ -1,0 +1,23 @@
+.maindiv{
+    margin: auto;
+    margin-top: 15px;
+    margin-bottom: 30px;
+    width: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+}
+
+span{
+    margin-left: 2px;
+}
+
+
+.card{
+    margin: auto;
+    display:grid;
+    justify-content: center;
+    align-items: center;
+    
+}
