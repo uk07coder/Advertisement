@@ -4,10 +4,10 @@ import './App.css';
 
 function App() {
   return (
-   <>
+  <>
   <Search></Search>
  
-   </>
+  </>
   );
 }
 

@@ -1,73 +1,77 @@
-const express=require('express');
-const app=express();
-const conn=require('./conn');
-const Ad=require('./models/ads');
-const Com=require('./models/companies');
-const cors =require('cors');
-const companies = require('./models/companies');
-
-
+const express = require("express");
+const app = express();
+const Ad = require("./models/ads");
+const cors = require("cors");
 
 app.use(cors());
 
-app.get('/',(req,res)=>{
+app.get("/search", (req, res) => {
+  const searchText = req.query.searchText;
 
-    const searchText = req.query.searchText;
-console.log(searchText);
-
-Ad.aggregate([
+  Ad.aggregate([
     {
-      '$lookup': {
-        'from': 'coms', 
-        'localField': 'companyId', 
-        'foreignField': '_id', 
-        'as': 'company'
-      }
-    }
-  ]).exec((err, result)=>{
+      $lookup: {
+        from: "coms",
+        localField: "companyId",
+        foreignField: "_id",
+        as: "company",
+      },
+    },
+    {
+      $unwind: {
+        path: "$company",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $match: {
+        $or: [
+          {
+            primaryText: {
+              $regex: searchText,
+              $options: "i",
+            },
+          },
+          {
+            headline: {
+              $regex: searchText,
+              $options: "i",
+            },
+          },
+          {
+            description: {
+              $regex: searchText,
+              $options: "i",
+            },
+          },
+          {
+            "company.name": {
+              $regex: searchText,
+              $options: "i",
+            }
+          }
+        ],
+      },
+    },
+  ]).exec((err, result) => {
     if (err) {
-        console.log("error" ,err)
+      console.log("error", err);
     }
     if (result) {
-        console.log(result);
-        res.send(result);
+      console.log(result);
+      res.send(result);
     }
+  });
+
+  //     Com.find({}).then((result)=>{
+  // res.send(result);
+  //     }).catch((error)=>{
+  // console.log(error);
+  //     })
 });
 
+const PORT = process.env.PORT || 4000;
 
-
-
-
-
-
-
-//     Com.find({}).then((result)=>{
-// res.send(result);
-//     }).catch((error)=>{
-// console.log(error);
-//     })
-})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const PORT=process.env.PORT||4000;
-
-
-app.listen(PORT,()=>{
-    console.log(`Connection Established at ${PORT}`)
-})
+app.listen(PORT, () => {
+  console.log(`Connection Established at ${PORT}`);
+});
